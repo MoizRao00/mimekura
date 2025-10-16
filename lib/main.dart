@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mimekura/screens/homepage.dart';
 
-
 void main() {
   runApp(const MyApp());
 }

@@ -187,6 +187,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             Positioned(
               top: screenHeight * .52,
               right: screenWidth * .025,
+              bottom: screenHeight * .35,
               child: SizedBox(
                 width: 52,
                 height: 52,
@@ -212,11 +213,17 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
 
             if (_showTube)
-              DispatchTubeAnimation(
-                controller: _tubeController,
-                buttonPosition: _buttonPosition,
-                buttonSize: const Size(52, 52),
+              Positioned(
+                // Make the tube start exactly above the send button
+                top: _buttonPosition.dy - 620, // tube appears above button
+                left: _buttonPosition.dx - 75, // center tube with button
+                child: DispatchTubeAnimation(
+                  controller: _tubeController,
+                  buttonPosition: _buttonPosition,
+                  buttonSize: const Size(52, 52),
+                ),
               ),
+
 
             // keyboard
 
