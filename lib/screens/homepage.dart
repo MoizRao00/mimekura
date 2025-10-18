@@ -24,6 +24,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   final _textController = TextEditingController();
   bool _isShiftEnabled = false;
   bool _isNumericMode = false;
+  bool _soundPlayed = false;
 
   // Animation + Sound
   late AnimationController _tubeController;
@@ -39,7 +40,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       duration: const Duration(seconds: 5),
     );
 
-
     _tubeController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _tubeController.reset();
@@ -48,6 +48,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             _showTube = false;
             _isSendingMessage = false;
             _textController.clear();
+            _soundPlayed = false;
           });
         }
       }
@@ -61,10 +62,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-
-
   Future<void> _playTubeSound() async {
-    await _audioPlayer.play(AssetSource('audio/shunk.mp3'));
+    await _audioPlayer.play(AssetSource('audio/1017.MP3'));
 
   }
 
@@ -86,11 +85,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       );
     }
   }
-
   void _onShiftPressed() => setState(() => _isShiftEnabled = !_isShiftEnabled);
   void _onNumericPressed() => setState(() => _isNumericMode = !_isNumericMode);
-
-
 
   void _onSendPressed() {
     if (_textController.text.isEmpty || _isSendingMessage) return;
@@ -103,11 +99,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       _showTube = true;
       _buttonPosition = position;
     });
-
     _tubeController.forward(from: 0);
-
-
-
   }
 
 
@@ -143,7 +135,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
 
             // text Field
-
             Positioned(
               top: screenHeight * .52,
               left: screenWidth * .04,
@@ -187,7 +178,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             Positioned(
               top: screenHeight * .52,
               right: screenWidth * .025,
-              bottom: screenHeight * .35,
               child: SizedBox(
                 width: 52,
                 height: 52,
@@ -213,18 +203,26 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
 
             if (_showTube)
-              Positioned(
-                // Make the tube start exactly above the send button
-                top: _buttonPosition.dy - 620, // tube appears above button
-                left: _buttonPosition.dx - 75, // center tube with button
-                child: DispatchTubeAnimation(
-                  controller: _tubeController,
-                  buttonPosition: _buttonPosition,
-                  buttonSize: const Size(52, 52),
-                ),
+              Builder(
+                builder: (context) {
+
+                  final double tubeAnimationHeight = MediaQuery.of(context).size.height * .6 + 100 + 100;
+                  const double tubeAnimationWidth = 200;
+
+                  final double topOffset = _buttonPosition.dy - tubeAnimationHeight + 50;
+                  final double leftOffset = _buttonPosition.dx - (tubeAnimationWidth / 2) + (52 / 2);
+
+                  return Positioned(
+                    top: topOffset,
+                    left: leftOffset,
+                    child: DispatchTubeAnimation(
+                      controller: _tubeController,
+                      buttonPosition: _buttonPosition,
+                      buttonSize: const Size(52, 52),
+                    ),
+                  );
+                },
               ),
-
-
             // keyboard
 
             Positioned(

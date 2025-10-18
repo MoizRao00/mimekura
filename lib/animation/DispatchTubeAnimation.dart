@@ -38,11 +38,16 @@ class _DispatchTubeAnimationState extends State<DispatchTubeAnimation> {
   void initState() {
     super.initState();
 
-    capsuleMoveUp.addListener(() {
-      if (capsuleMoveUp.value > 0.8 && !_playedTopSound) {
-        _playedTopSound = true;
+    widget.controller.addStatusListener((status) {
+      if (status == AnimationStatus.reverse || status == AnimationStatus.dismissed) {
+        _playedTopSound = false;
+      }
+    });
 
-        _player.play(AssetSource('audio/shunk.mp3'));
+    capsuleEnter.addListener(() {
+      if (capsuleEnter.value > .5 && !_playedTopSound) {
+        _playedTopSound = true;
+        _player.play(AssetSource('audio/1017.MP3'));
       }
     });
   }
@@ -75,14 +80,10 @@ class _DispatchTubeAnimationState extends State<DispatchTubeAnimation> {
 
   Widget _buildGlassTube(double tubeHeight) {
     final Color warmHighlight = const Color(0xFFFFF8E1).withOpacity(0.30);
-
     final Color warmShadow = const Color(0xFF5D4037).withOpacity(0.30);
-
     final ribGradient = LinearGradient(
       begin: Alignment.centerLeft,
-
       end: Alignment.centerRight,
-
       colors: [
         warmShadow,
         warmHighlight,
@@ -90,26 +91,19 @@ class _DispatchTubeAnimationState extends State<DispatchTubeAnimation> {
         warmHighlight,
         warmShadow,
       ],
-
       stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
     );
 
     return Container(
       width: 45,
-
       height: tubeHeight,
-
       decoration: BoxDecoration(
         color: const Color(0xFF874d00).withOpacity(0.3),
-
         border: Border.all(color: paperBrassBorder, width: 2.5),
-
         borderRadius: BorderRadius.circular(12),
       ),
-
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
-
         child: Container(decoration: BoxDecoration(gradient: ribGradient)),
       ),
     );
@@ -228,28 +222,28 @@ class _DispatchTubeAnimationState extends State<DispatchTubeAnimation> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final double tubeHeight = screenHeight * .5;
+    final double tubeHeight = screenHeight * .6;
     final double baseHeight = 100;
 
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, child) {
-        return SizedBox(
-          width: 200,
-          height: tubeHeight + baseHeight + 100,
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                  bottom : baseHeight + 40,
-              child: _buildGlassTube(tubeHeight)),
-              Positioned.fill(
-                bottom: baseHeight - 40,
-                child: _buildCapsule(45, tubeHeight),
-              ),
-              Positioned(bottom: 0, child: const BrassBaseWidget()),
-            ],
+        return FadeTransition(
+          opacity: tubeOpacity,
+          child: SizedBox(
+            width: 200,
+            height: tubeHeight + baseHeight + 100,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                    bottom : baseHeight + 40,
+                child: _buildGlassTube(tubeHeight)),
+                _buildCapsule(45, tubeHeight),
+                Positioned(bottom: 0, child: const BrassBaseWidget()),
+              ],
+            ),
           ),
         );
       },
